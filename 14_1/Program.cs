@@ -11,7 +11,7 @@ namespace _14_1
     class MyThreads
     {
         Stopwatch stopeWatch = new Stopwatch();
-
+        CountdownEvent cde;
         public void ThreadTimer()
         {
             int count = 10;
@@ -19,32 +19,32 @@ namespace _14_1
             {
                 Console.WriteLine($"Поток {i}");
 
-                using (var countdownEvent = new CountdownEvent(i))
-                {
+                cde = new CountdownEvent(i);
+                
                     stopeWatch.Restart();
                     for (int j = 0; j < i; j++)
                     {
-                        new Thread(delegate () {countdownEvent.Signal();}).Start();
+                        new Thread(delegate () { cde.Signal();}).Start();
                     }
-                    countdownEvent.Wait();
+                    cde.Wait();
                     Console.WriteLine($"Запущен {i} поток {stopeWatch.Elapsed}\n");
-                }
 
-                Thread.Sleep(1);
+
+                Thread.Sleep(100);
 
                 Console.WriteLine($"Поток в пуле {i}");
 
-                using (var countdownEvent = new CountdownEvent(i))
-                {
+                cde = new CountdownEvent(i);
+                
                     stopeWatch.Restart();
                     for (int j = 0; j < i; ++j)
                     {
-                        ThreadPool.QueueUserWorkItem(delegate (object obj){countdownEvent.Signal();});
+                        ThreadPool.QueueUserWorkItem(delegate (object obj){cde.Signal();});
                     }
 
-                    countdownEvent.Wait();
+                    cde.Wait();
                     Console.WriteLine($"Запущен {i} поток из пула {stopeWatch.Elapsed}\n");
-                }
+
 
             }
         }
